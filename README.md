@@ -56,6 +56,12 @@ playwright install chromium
 
 > 请用 `zhuzhu-ppt-skill` 读取当前目录下的 `xxx调研.md`，帮我做一份 8–10 页的组会 PPT。
 
+## 🙏 鸣谢
+
+感谢 [LINUX DO](https://linux.do/) 社区的交流与支持，以及 [python-pptx](https://python-pptx.readthedocs.io/)、[PyMuPDF](https://pymupdf.readthedocs.io/)、[Playwright](https://playwright.dev/) 等开源项目。
+
+[![LINUX DO](https://img.shields.io/badge/LINUX%20DO-Community-1677FF?style=flat-square)](https://linux.do/)
+
 ## License
 
 MIT License
