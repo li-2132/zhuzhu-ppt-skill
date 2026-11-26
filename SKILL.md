@@ -10,7 +10,7 @@ description: >-
 
 ## 核心原则
 
-1. **极简纯白底，拒绝花哨商务模板**：纯白 `#FFFFFF` 画布、16:9 宽屏、大留白、极细灰线；禁止使用带商务图标集群、小旗子路线图、水印装饰或 `10.5pt` 密字卡片的现成商务模板。
+1. **极简纯白底，去盒化排版，拒绝 AI 卡片风**：纯白 `#FFFFFF` 画布、16:9 宽屏、大留白、极细灰线；禁止使用花哨商务模板，也**严禁滥用“彩色左竖线 + 淡色背景框”把每段正文装进卡片**（这是典型 AI 生成味）。常规要点、多栏解读与讨论议题直接写在纯白画布上，靠留白、字重层级与 0.5–1pt 极细横/竖线分区。
 2. **讲懂优先，主动深挖一层**：不要机械照搬用户 md 的章节顺序；按“问题出发点 → 核心前提/架构澄清 → 全景定位 → 关键论文机制深挖 → 竞品对比 → 行动计划与讨论”重组叙事。原文引用的关键论文有公开 PDF（如 arXiv）时，**主动下载原文深读机制与局限**，补足笔记里没展开的硬核细节。
 3. **以图/表代长文（多模态辅助）**：
    - **论文原图**：从核心论文 PDF 以 300 DPI 截取拓扑图、实测曲线、系统架构或执行轨迹图，附简短出处，并可用原生虚线框 + 批注框直接指出论文局限。
@@ -47,8 +47,8 @@ description: >-
 
 ### 3. 用 `python-pptx` 构建原生白底 PPTX
 
-- 排版网格、配色、字号梯度、三线表样式规范见 [references/design-system.md](./references/design-system.md)。
-- 直接复用 [scripts/pptx_helpers.py](./scripts/pptx_helpers.py) 中的 `add_header_footer`、`add_picture_fit`、`style_cell`、`add_textbox`、`add_callout`、`add_notes` 等基础组件编写构建脚本。
+- 排版网格、配色、字号梯度、去盒化规则与三线表样式规范见 [references/design-system.md](./references/design-system.md)。
+- 直接复用 [scripts/pptx_helpers.py](./scripts/pptx_helpers.py) 中的 `add_header_footer`、`add_picture_fit`、`style_cell`、`add_textbox`、`add_text_section`、`add_notes` 等无底色基础组件编写构建脚本；`add_callout` 仅限全套 PPT 最关键的 1–2 处单行结论或公式区，且默认不加左竖彩条。
 - **所有文字、表格、批注框均为原生可编辑对象**，每页务必填充对应演讲者备注（Speaker Notes）。
 
 ### 4. 去 AI 味文案自审
@@ -67,6 +67,7 @@ python3 scripts/verify_pptx.py output.pptx ./slide_previews
 
 然后用读图工具**逐页查看渲染图**，重点检查并修正：
 - 文本框溢出警告必须为 `0`；
+- 视觉去 AI 味告警（`VISUAL_AI`：禁止彩条装饰、控制浅底框频次）必须为 `0`；
 - 消除 1–2 字的孤字换行（widow）；
 - 核对叠在生图上的原生中文标签是否居中对齐；
 - 核对论文图上的虚线强调框是否精准落在目标区域。

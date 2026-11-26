@@ -3,6 +3,7 @@
   1. OOXML ZIP integrity (0 duplicate entries, 0 broken slide rels)
   2. Zero vertical text-box overflows (>8px)
   3. Zero accidental AI-cliché / trailing-ellipsis text flags
+  4. Visual de-AI lint: zero thick accent bars, restrained tinted boxes (<=1/slide, <=3/deck)
 """
 import base64
 import html
@@ -106,10 +107,13 @@ def verify_and_render(pptx_path: str, out_dir: str):
     os.makedirs(out_dir, exist_ok=True)
 
     style_notes = []
+    visual_ai_notes = []
+    total_tinted_boxes = 0
     pages_html = []
 
     for s_idx, slide in enumerate(prs.slides, 1):
         elems = []
+        slide_tinted_boxes = 0
         for sh in slide.shapes:
             x = sh.left / EMU_PER_PX
             y = sh.top / EMU_PER_PX
@@ -163,6 +167,16 @@ def verify_and_render(pptx_path: str, out_dir: str):
                     elems.append(f'<div style="position:absolute;left:{x:.1f}px;top:{y:.1f}px;width:{lw:.1f}px;height:{h:.1f}px;background:{lc};"></div>')
             else:
                 bg = fill_hex(sh.fill) if hasattr(sh, "fill") else None
+                has_txt = bool(sh.has_text_frame and sh.text_frame.text.strip())
+                if bg and bg.upper() != "#FFFFFF" and not has_txt:
+                    # Flag AI-cliché thick vertical/horizontal accent bars
+                    if (w <= 14 and h >= 20) or (2.5 < h <= 10 and w >= 120):
+                        visual_ai_notes.append(
+                            f"Slide {s_idx} sid={sh.shape_id}: thick accent bar ({w:.0f}x{h:.0f}px, {bg}) — avoid AI bar+box style"
+                        )
+                    elif w >= 140 and h >= 45:
+                        slide_tinted_boxes += 1
+                        total_tinted_boxes += 1
                 lc, lw, dashed = None, 1.0, "solid"
                 try:
                     if sh.line.fill.type == 1:
@@ -194,6 +208,10 @@ def verify_and_render(pptx_path: str, out_dir: str):
                     f'padding:{pad_css};overflow:visible;">{inner}</div>'
                 )
 
+        if slide_tinted_boxes > 1:
+            visual_ai_notes.append(
+                f"Slide {s_idx}: {slide_tinted_boxes} tinted background boxes (>1/slide) — place regular body text directly on white canvas"
+            )
         phtml = f"""<!DOCTYPE html><html><head><meta charset="utf-8"><style>
 * {{ box-sizing:border-box; margin:0; padding:0; }}
 body {{
@@ -226,9 +244,16 @@ body {{
     print(f"Text box overflow alerts (>8px): {len(overflows)}")
     for o in overflows:
         print("  OVERFLOW:", o)
+    if total_tinted_boxes > 3:
+        visual_ai_notes.append(
+            f"Deck total: {total_tinted_boxes} tinted background boxes (>3/deck) — limit tinted boxes to 1-3 key formulas/takeaways"
+        )
     print(f"De-AI / ellipsis lint notes: {len(style_notes)}")
     for n in style_notes:
         print("  STYLE:", n)
+    print(f"Visual AI-slop alerts: {len(visual_ai_notes)}")
+    for v in visual_ai_notes:
+        print("  VISUAL_AI:", v)
 
 
 if __name__ == "__main__":

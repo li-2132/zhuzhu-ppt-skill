@@ -134,14 +134,27 @@ def add_picture_fit(slide, img_path, x, y, max_w, max_h, *, center_x=True, cente
     return pic, (px, py, w, h)
 
 
-def add_callout(slide, x, y, w, h, lines, *, fill=SURFACE, accent=BLUE, bar_side="left"):
-    add_rect(slide, x, y, w, h, fill=fill, line=BORDER if fill == SURFACE else None, line_pt=0.75)
-    if bar_side == "left":
-        add_rect(slide, x, y, 0.07, h, fill=accent)
-        add_textbox(slide, x + 0.22, y + 0.08, w - 0.34, h - 0.14, lines, margin=(0, 0, 0, 0))
+def add_text_section(slide, x, y, w, h, lines, *, top_rule=None, top_rule_pt=1.0, rule_width=None):
+    """Preferred pure-white borderless content block: typography + whitespace + optional thin top rule."""
+    top_pad = 0.0
+    if top_rule is not None:
+        rw = rule_width if rule_width is not None else w
+        add_line(slide, x, y, x + rw, y, color=top_rule, width_pt=top_rule_pt)
+        top_pad = 0.12
+    return add_textbox(slide, x, y + top_pad, w, max(0.2, h - top_pad), lines, margin=(0, 0, 0, 0))
+
+
+def add_callout(slide, x, y, w, h, lines, *, fill=SURFACE, border=BORDER, accent=None, bar_side=None):
+    """Sparingly-used quiet tinted box (max 1 per slide, <=3 per deck; no thick accent bars by default)."""
+    add_rect(slide, x, y, w, h, fill=fill, line=border, line_pt=0.75)
+    if bar_side == "left" and accent is not None:
+        add_rect(slide, x, y, 0.05, h, fill=accent)
+        add_textbox(slide, x + 0.20, y + 0.10, w - 0.32, h - 0.16, lines, margin=(0, 0, 0, 0))
+    elif bar_side == "top" and accent is not None:
+        add_rect(slide, x, y, w, 0.04, fill=accent)
+        add_textbox(slide, x + 0.18, y + 0.14, w - 0.36, h - 0.22, lines, margin=(0, 0, 0, 0))
     else:
-        add_rect(slide, x, y, w, 0.06, fill=accent)
-        add_textbox(slide, x + 0.18, y + 0.16, w - 0.36, h - 0.24, lines, margin=(0, 0, 0, 0))
+        add_textbox(slide, x + 0.18, y + 0.11, w - 0.36, h - 0.20, lines, margin=(0, 0, 0, 0))
 
 
 def style_cell(cell, text, *, size=10.5, bold=False, color=BODY, fill=None,
@@ -204,8 +217,7 @@ def style_cell(cell, text, *, size=10.5, bold=False, color=BODY, fill=None,
 
 def add_header_footer(slide, page_num, total_pages, kicker, title, *, footer_left="", accent=BLUE):
     set_slide_bg(slide, WHITE)
-    add_rect(slide, 0.60, 0.30, 0.06, 0.20, fill=accent)
-    add_textbox(slide, 0.74, 0.25, 6.0, 0.28, [(kicker, 10.5, True, accent)], margin=(0, 0, 0, 0))
+    add_textbox(slide, 0.60, 0.26, 6.5, 0.26, [(kicker, 10.0, True, accent)], margin=(0, 0, 0, 0))
     add_textbox(slide, 0.60, 0.52, 12.13, 0.48, [(title, 19.5, True, INK)], margin=(0, 0, 0, 0))
     add_line(slide, 0.60, 1.04, 12.73, 1.04, color=BORDER, width_pt=0.8)
 
