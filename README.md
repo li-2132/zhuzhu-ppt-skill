@@ -56,6 +56,17 @@ playwright install chromium
 
 > 请用 `zhuzhu-ppt-skill` 读取当前目录下的 `xxx调研.md`，帮我做一份 8–10 页的组会 PPT。
 
+
+## 效果展示
+以AGY为例
+
+效果图：
+<img width="2542" height="660" alt="image" src="https://github.com/user-attachments/assets/36849268-b4cf-40ad-b142-d4c0b333c117" />
+
+<img width="1920" height="1131" alt="image" src="https://github.com/user-attachments/assets/c8d177c8-aec4-49a9-bc1a-638e737a3a48" />
+
+<img width="1920" height="1118" alt="image" src="https://github.com/user-attachments/assets/7ee29a58-790a-430e-a6c8-bb6a1701680b" />
+
 ## 🙏 鸣谢
 
 感谢 [LINUX DO](https://linux.do/) 社区的交流与支持，以及 [python-pptx](https://python-pptx.readthedocs.io/)、[PyMuPDF](https://pymupdf.readthedocs.io/)、[Playwright](https://playwright.dev/) 等开源项目。
